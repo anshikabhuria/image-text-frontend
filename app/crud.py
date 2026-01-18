@@ -2,11 +2,14 @@ import os
 import uuid
 from typing import Dict
 
+from app.nlp.mission_parser import parse_mission
+
 UPLOAD_DIR = "storage/images"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 db: Dict[int, dict] = {}
 counter = 1
+
 
 def save_image_and_text(image_file, text: str):
     global counter
@@ -18,10 +21,14 @@ def save_image_and_text(image_file, text: str):
     with open(file_path, "wb") as f:
         f.write(image_file.file.read())
 
+    # 🔹 NLP processing
+    nlp_result = parse_mission(text)
+
     record = {
         "id": counter,
         "text": text,
-        "image_path": file_path
+        "image_path": file_path,
+        "nlp": nlp_result
     }
 
     db[counter] = record
