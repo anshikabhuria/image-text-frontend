@@ -4,6 +4,10 @@ from typing import Dict
 
 from app.nlp.mission_parser import parse_mission
 
+from app.cv.yolo_model import yolo_service
+from app.nlp.mission_parser import parse_mission
+
+
 UPLOAD_DIR = "storage/images"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -24,11 +28,15 @@ def save_image_and_text(image_file, text: str):
     # 🔹 NLP processing
     nlp_result = parse_mission(text)
 
+    # YOLO
+    vision_result = yolo_service.run_inference(file_path)
+
     record = {
         "id": counter,
         "text": text,
         "image_path": file_path,
-        "nlp": nlp_result
+        "nlp": nlp_result,
+        "vision": vision_result
     }
 
     db[counter] = record
