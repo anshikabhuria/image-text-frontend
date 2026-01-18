@@ -8,7 +8,8 @@ class NLPResult(BaseModel):
 
 
 class VisionDetection(BaseModel):
-    label: str
+    species: str
+    bbox: List[float]   # [x_min, y_min, x_max, y_max]
     confidence: float
 
 

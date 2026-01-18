@@ -19,12 +19,17 @@ class YoloService:
             confidence = float(box.conf[0])
             label = self.model.names[cls_id]
 
+            x_min, y_min, x_max, y_max = box.xyxy[0].tolist()
+
             detections.append({
-                "label": label,
+                "species": label.capitalize(),   # important
+                "bbox": [x_min, y_min, x_max, y_max],
                 "confidence": confidence
             })
 
         return detections
+
+
 
 
 # Singleton instance (loaded ONCE)
