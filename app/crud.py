@@ -1,0 +1,30 @@
+import os
+import uuid
+from typing import Dict
+
+UPLOAD_DIR = "storage/images"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+db: Dict[int, dict] = {}
+counter = 1
+
+def save_image_and_text(image_file, text: str):
+    global counter
+
+    file_extension = image_file.filename.split(".")[-1]
+    filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+
+    with open(file_path, "wb") as f:
+        f.write(image_file.file.read())
+
+    record = {
+        "id": counter,
+        "text": text,
+        "image_path": file_path
+    }
+
+    db[counter] = record
+    counter += 1
+
+    return record
