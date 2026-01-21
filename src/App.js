@@ -9,21 +9,40 @@ function App() {
   // Mission text
   const [missionText, setMissionText] = useState("");
 
-  // UI state
+  // UI states
   const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState(null);
 
-  // 🔹 Run Detection (NO mock results, backend-ready)
-  const handleRunDetection = () => {
+  // 🔹 Run Detection → BACKEND CONNECTED
+  const handleRunDetection = async () => {
+    if (!imageFile || !missionText) return;
+
     setLoading(true);
+    setResults(null);
 
-    // Placeholder for backend API call
-    setTimeout(() => {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("text", missionText);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/upload/", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      setResults(data);
+    } catch (error) {
+      console.error("Detection failed:", error);
+      alert("Backend error. Check server.");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
     <div className="app">
+      {/* HEADER */}
       <header className="header">
         Identify the Imposter Pokémon
         <span className="status">
@@ -81,11 +100,19 @@ Do not harm Pikachu or Charizard.`}
               </span>
             </div>
 
-            {/* RUN DETECTION */}
+            {/* RUN BUTTON */}
             <button
               className="run-btn"
               onClick={handleRunDetection}
               disabled={!imageFile || !missionText || loading}
+              style={{
+                opacity:
+                  !imageFile || !missionText || loading ? 0.6 : 1,
+                cursor:
+                  !imageFile || !missionText || loading
+                    ? "not-allowed"
+                    : "pointer",
+              }}
             >
               {loading ? "Running Detection..." : "Run Detection"}
             </button>
@@ -94,10 +121,23 @@ Do not harm Pikachu or Charizard.`}
           {/* RESULTS */}
           <div className="card">
             <h3>Results</h3>
-            <div className="empty">
-              <p>No detections yet</p>
-              <span>Upload an image and run detection</span>
-            </div>
+
+            {!results ? (
+              <div className="empty">
+                <p>No detections yet</p>
+                <span>Upload an image and run detection</span>
+              </div>
+            ) : (
+              <pre
+                style={{
+                  fontSize: "12px",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
+                {JSON.stringify(results, null, 2)}
+              </pre>
+            )}
           </div>
         </div>
 
